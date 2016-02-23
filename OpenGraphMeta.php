@@ -44,7 +44,8 @@ function efSetMainImagePF( $parser, $mainimage ) {
 
 $wgParserOutputHooks['setmainimage'] = 'efSetMainImagePH';
 function efSetMainImagePH( $out, $parserOutput, $data ) {
-	$out->mMainImage = wfFindFile( Title::newFromDBkey($data['dbkey'], NS_FILE) );
+	$title = Title::makeTitle( NS_FILE, Title::newFromText($data["dbkey"])); 
+	$out->mMainImage = wfFindFile($title);
 }
 
 $wgHooks['BeforePageDisplay'][] = 'efOpenGraphMetaPageHook';
@@ -70,10 +71,9 @@ function efOpenGraphMetaPageHook( &$out, &$sk ) {
 			$meta["og:title"] = $title->getText();
 		}
 	}
-
 	if ( isset( $out->mMainImage ) && ( $out->mMainImage !== false ) ) {
 		if( is_object( $out->mMainImage ) ){
-			$meta["og:image"] = wfExpandUrl($out->mMainImage->createThumb(100*3, 100));
+			$meta["og:image"] = $out->mMainImage->getFullUrl();
 		} else {
 			// In some edge-cases we won't have defined an object but rather a full URL.
 			$meta["og:image"] = $out->mMainImage;
@@ -107,4 +107,3 @@ function efOpenGraphMetaPageHook( &$out, &$sk ) {
 
 $egFacebookAppId = null;
 $egFacebookAdmins = null;
-
